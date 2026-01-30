@@ -532,7 +532,7 @@
 </div>
 
 <div id="adminBackupBtn" style="display: none; text-align: center; margin-top: 60px;">
-  <button onclick="backupParaFirebase()">Backup manual (usuários + folgas + ranking + meta geral) SALVAR</button>
+  <button onclick="backupParaFirebase()">Backup manual (usuários + folgas + ranking + metas mensais) SALVAR</button>
 </div>
 
 <h2>Login</h2>
@@ -566,6 +566,7 @@
     <div class="tab" data-tab="calendario">Calendário de Folgas</div>
     <div class="tab" data-tab="ranking">Ranking de Vendas</div>
     <div class="tab" data-tab="metas">Metas de Vendas</div>
+    <div class="tab" data-tab="metasGrid">Metas de Grid</div>
   </div>
 
   <!-- Conteúdo da aba de folgas -->
@@ -677,6 +678,7 @@
       <input type="date" id="dataRanking" value="">
       <input type="number" id="totalVendas" placeholder="Total de Vendas" min="0">
       <input type="number" id="totalAbastecimentos" placeholder="Total de Abastecimentos" min="0">
+      <input type="number" id="totalGrid" placeholder="Total de Grid" min="0">
       <button onclick="adicionarDadosRanking()">Salvar Dados</button>
     </div>
     
@@ -703,6 +705,7 @@
         <select id="ordenacaoRankingSelect" onchange="atualizarTabelasRanking()">
           <option value="vendas">Maior Total de Vendas</option>
           <option value="abastecimentos">Maior Total de Abastecimentos</option>
+          <option value="grid">Maior Total de Grid</option>
         </select>
       </div>
     </div>
@@ -726,6 +729,10 @@
         <span>Total de Abastecimentos:</span>
         <strong id="totalAbastecimentosUsuario">0</strong>
       </div>
+      <div class="posicao-info">
+        <span>Total de Grid:</span>
+        <strong id="totalGridUsuario">0</strong>
+      </div>
     </div>
     
     <!-- Tabelas de ranking (visíveis apenas para admin) -->
@@ -737,6 +744,7 @@
             <th>Funcionário</th>
             <th>Total de Vendas</th>
             <th>Total de Abastecimentos</th>
+            <th>Total de Grid</th>
           </tr>
         </thead>
         <tbody id="rankingManhaTbody">
@@ -751,6 +759,7 @@
             <th>Funcionário</th>
             <th>Total de Vendas</th>
             <th>Total de Abastecimentos</th>
+            <th>Total de Grid</th>
           </tr>
         </thead>
         <tbody id="rankingTardeTbody">
@@ -772,10 +781,31 @@
   <!-- Conteúdo da aba de metas -->
   <div class="tab-content" id="metasContent">
     <div id="metaGeralAdminSection" class="hidden" style="margin-bottom: 20px; padding: 15px; background-color: #e8f5e9; border-radius: 5px; border-left: 4px solid #8bc34a;">
-      <h4>Definir Meta Geral Mensal para Todos os Funcionários</h4>
-      <label for="metaGeralInput" style="display: block; margin-bottom: 5px; font-weight: bold;">Meta Geral Mensal:</label>
-      <input type="number" id="metaGeralInput" placeholder="Ex: 1000" min="0" style="width: 150px; padding: 8px; border: 1px solid #ddd; border-radius: 3px;">
-      <button onclick="salvarMetaGeral()" style="padding: 8px 15px; margin-left: 10px; background-color: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">Salvar Meta Geral</button>
+      <h4>Definir Meta de Vendas Mensal</h4>
+      <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end;">
+        <div style="flex: 1; min-width: 150px;">
+          <label for="metaGeralMesSelect" style="display: block; margin-bottom: 5px; font-weight: bold;">Selecione o Mês:</label>
+          <select id="metaGeralMesSelect" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 3px;">
+            <option value="0">Janeiro</option>
+            <option value="1">Fevereiro</option>
+            <option value="2">Março</option>
+            <option value="3">Abril</option>
+            <option value="4">Maio</option>
+            <option value="5">Junho</option>
+            <option value="6">Julho</option>
+            <option value="7">Agosto</option>
+            <option value="8">Setembro</option>
+            <option value="9">Outubro</option>
+            <option value="10">Novembro</option>
+            <option value="11">Dezembro</option>
+          </select>
+        </div>
+        <div style="flex: 1; min-width: 150px;">
+          <label for="metaGeralInput" style="display: block; margin-bottom: 5px; font-weight: bold;">Meta de Vendas:</label>
+          <input type="number" id="metaGeralInput" placeholder="Ex: 1000" min="0" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 3px;">
+        </div>
+        <button onclick="salvarMetaGeral()" style="padding: 8px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">Salvar Meta para o Mês</button>
+      </div>
     </div>
     
     <!-- Filtros de metas -->
@@ -824,6 +854,83 @@
       </tbody>
     </table>
   </div>
+
+  <!-- Conteúdo da aba de metas de grid -->
+  <div class="tab-content" id="metasGridContent">
+    <div id="metaGeralGridAdminSection" class="hidden" style="margin-bottom: 20px; padding: 15px; background-color: #e8f5e9; border-radius: 5px; border-left: 4px solid #8bc34a;">
+      <h4>Definir Meta de Grid Mensal</h4>
+      <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end;">
+        <div style="flex: 1; min-width: 150px;">
+          <label for="metaGeralGridMesSelect" style="display: block; margin-bottom: 5px; font-weight: bold;">Selecione o Mês:</label>
+          <select id="metaGeralGridMesSelect" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 3px;">
+            <option value="0">Janeiro</option>
+            <option value="1">Fevereiro</option>
+            <option value="2">Março</option>
+            <option value="3">Abril</option>
+            <option value="4">Maio</option>
+            <option value="5">Junho</option>
+            <option value="6">Julho</option>
+            <option value="7">Agosto</option>
+            <option value="8">Setembro</option>
+            <option value="9">Outubro</option>
+            <option value="10">Novembro</option>
+            <option value="11">Dezembro</option>
+          </select>
+        </div>
+        <div style="flex: 1; min-width: 150px;">
+          <label for="metaGeralGridInput" style="display: block; margin-bottom: 5px; font-weight: bold;">Meta de Grid:</label>
+          <input type="number" id="metaGeralGridInput" placeholder="Ex: 500" min="0" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 3px;">
+        </div>
+        <button onclick="salvarMetaGeralGrid()" style="padding: 8px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">Salvar Meta para o Mês</button>
+      </div>
+    </div>
+    
+    <!-- Filtros de metas de grid -->
+    <div class="filtros-ranking">
+      <div class="filtro-item">
+        <label for="filtroTurnoMetasGrid">Filtrar por Turno:</label>
+        <select id="filtroTurnoMetasGrid" onchange="atualizarTabelasMetasGrid()">
+          <option value="todos">Todos os Turnos</option>
+          <option value="manha">Turno da Manhã</option>
+          <option value="tarde">Turno da Tarde</option>
+        </select>
+      </div>
+      
+      <div class="filtro-item">
+        <label for="filtroMesMetasGrid">Filtrar por Mês:</label>
+        <select id="filtroMesMetasGrid" onchange="atualizarTabelasMetasGrid()">
+          <!-- Opções de mês serão adicionadas dinamicamente -->
+        </select>
+      </div>
+    </div>
+    <h3>Metas de Grid - Turno da Manhã</h3>
+    <table class="metas-table" id="metasGridManhaTable">
+      <thead>
+        <tr>
+          <th>Funcionário</th>
+          <th>Grid/Falta</th>
+          <th>Progresso</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Dados serão preenchidos via JavaScript -->
+      </tbody>
+    </table>
+
+    <h3>Metas de Grid - Turno da Tarde</h3>
+    <table class="metas-table" id="metasGridTardeTable">
+      <thead>
+        <tr>
+          <th>Funcionário</th>
+          <th>Grid/Falta</th>
+          <th>Progresso</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Dados serão preenchidos via JavaScript -->
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <!-- Modal para edição de dados -->
@@ -845,6 +952,9 @@
       
       <label for="modalAbastecimentos">Total de Abastecimentos:</label>
       <input type="number" id="modalAbastecimentos" min="0">
+      
+      <label for="modalGrid">Total de Grid:</label>
+      <input type="number" id="modalGrid" min="0">
     </div>
     <div class="modal-actions">
       <button class="btn-salvar" onclick="salvarEdicaoDados()">Salvar</button>
@@ -925,6 +1035,10 @@
         if (tabId === 'metas') {
           preencherFiltroMesMetas();
           atualizarTabelasMetas();
+        }
+        if (tabId === 'metasGrid') {
+          preencherFiltroMesMetasGrid();
+          atualizarTabelasMetasGrid();
         }
       });
     });
@@ -1027,6 +1141,11 @@
         if (metaGeralSection) {
           metaGeralSection.classList.remove("hidden");
         }
+        // Mostrar seção de meta geral de grid para administradores
+        const metaGeralGridSection = document.getElementById('metaGeralGridAdminSection');
+        if (metaGeralGridSection) {
+          metaGeralGridSection.classList.remove("hidden");
+        }
         // Mostrar seção de adicionar dados diários para administradores
         const rankingFormSection = document.getElementById("rankingForm");
         if (rankingFormSection) {
@@ -1042,6 +1161,11 @@
         const metaGeralSection = document.getElementById("metaGeralAdminSection");
         if (metaGeralSection) {
           metaGeralSection.classList.add("hidden");
+        }
+        // Esconder seção de meta geral de grid para funcionários
+        const metaGeralGridSection = document.getElementById("metaGeralGridAdminSection");
+        if (metaGeralGridSection) {
+          metaGeralGridSection.classList.add("hidden");
         }
         // Esconder seção de adicionar dados diários para funcionários
         const rankingFormSection = document.getElementById("rankingForm");
@@ -1139,6 +1263,11 @@
     const metaGeralSection = document.getElementById('metaGeralAdminSection');
     if (metaGeralSection) {
       metaGeralSection.classList.add("hidden");
+    }
+    // Esconder seção de meta geral de grid no logout
+    const metaGeralGridSection = document.getElementById('metaGeralGridAdminSection');
+    if (metaGeralGridSection) {
+      metaGeralGridSection.classList.add("hidden");
     }
     // Esconder seção de adicionar dados diários no logout
     const rankingFormSection = document.getElementById("rankingForm");
@@ -1746,6 +1875,45 @@
     // Selecionar mês atual por padrão
     const mesAtual = new Date().getMonth();
     select.value = mesAtual;
+    
+    // Atualizar meta ao mudar o mês no filtro
+    select.onchange = function() {
+      atualizarTabelasMetas();
+    };
+  }
+
+  // Função para preencher o filtro de mês das metas de grid
+  function preencherFiltroMesMetasGrid() {
+    const select = document.getElementById('filtroMesMetasGrid');
+    select.innerHTML = '';
+
+    // Adicionar opção para todos os meses
+    const optionTodos = document.createElement('option');
+    optionTodos.value = 'todos';
+    optionTodos.textContent = 'Todos os Meses';
+    select.appendChild(optionTodos);
+
+    // Adicionar opções para cada mês
+    const meses = [
+      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ];
+
+    meses.forEach((mes, index) => {
+      const option = document.createElement('option');
+      option.value = index;
+      option.textContent = mes;
+      select.appendChild(option);
+    });
+
+    // Selecionar mês atual por padrão
+    const mesAtual = new Date().getMonth();
+    select.value = mesAtual;
+    
+    // Atualizar meta ao mudar o mês no filtro
+    select.onchange = function() {
+      atualizarTabelasMetasGrid();
+    };
   }
 
   function adicionarDadosRanking() {
@@ -1753,6 +1921,7 @@
     const data = document.getElementById('dataRanking').value;
     const totalVendas = parseInt(document.getElementById('totalVendas').value) || 0;
     const totalAbastecimentos = parseInt(document.getElementById('totalAbastecimentos').value) || 0;
+    const totalGrid = parseInt(document.getElementById('totalGrid').value) || 0;
 
     if (!login || !data) {
       alert('Selecione um usuário e uma data!');
@@ -1766,17 +1935,20 @@
     }
 
     // Adicionar ou atualizar dados, preservando valores existentes se não forem fornecidos novos
-    const dadosExistentes = ranking[login][data] || { vendas: 0, abastecimentos: 0 };
+    const dadosExistentes = ranking[login][data] || { vendas: 0, abastecimentos: 0, grid: 0 };
     const novasVendasInput = document.getElementById('totalVendas').value;
     const novosAbastecimentosInput = document.getElementById('totalAbastecimentos').value;
+    const novoGridInput = document.getElementById('totalGrid').value;
 
     // Usa o novo valor se fornecido, senão mantém o existente
     const finalVendas = novasVendasInput !== '' ? (parseInt(novasVendasInput) || 0) : dadosExistentes.vendas;
     const finalAbastecimentos = novosAbastecimentosInput !== '' ? (parseInt(novosAbastecimentosInput) || 0) : dadosExistentes.abastecimentos;
+    const finalGrid = novoGridInput !== '' ? (parseInt(novoGridInput) || 0) : dadosExistentes.grid;
 
     ranking[login][data] = {
       vendas: finalVendas,
-      abastecimentos: finalAbastecimentos
+      abastecimentos: finalAbastecimentos,
+      grid: finalGrid
     };
 
     // Salvar ranking
@@ -1784,6 +1956,7 @@
     alert('Dados adicionados com sucesso!');
     document.getElementById('totalVendas').value = '';
     document.getElementById('totalAbastecimentos').value = '';
+    document.getElementById('totalGrid').value = '';
     atualizarTabelasRanking();
     backupAutomaticoSeAtivo();
   }
@@ -1814,7 +1987,8 @@
         login,
         turno,
         totalVendas: 0,
-        totalAbastecimentos: 0
+        totalAbastecimentos: 0,
+        totalGrid: 0
       };
       
       // Somar dados do usuário
@@ -1831,16 +2005,23 @@
         // Somar valores
         const totalVendasDia = valores.vendas || 0;
         const totalAbastecimentosDia = valores.abastecimentos || 0;
+        const totalGridDia = valores.grid || 0;
         
         totais[login].totalVendas += totalVendasDia;
         totais[login].totalAbastecimentos += totalAbastecimentosDia;
+        totais[login].totalGrid += totalGridDia;
       });
     });
     
-    // Ordenar usuários conforme seleção (vendas ou abastecimentos)
-    const compararPor = ordenacaoPor === "vendas" 
-      ? (a, b) => b.totalVendas - a.totalVendas 
-      : (a, b) => b.totalAbastecimentos - a.totalAbastecimentos;
+    // Ordenar usuários conforme seleção (vendas, abastecimentos ou grid)
+    let compararPor;
+    if (ordenacaoPor === "vendas") {
+      compararPor = (a, b) => b.totalVendas - a.totalVendas;
+    } else if (ordenacaoPor === "abastecimentos") {
+      compararPor = (a, b) => b.totalAbastecimentos - a.totalAbastecimentos;
+    } else {
+      compararPor = (a, b) => b.totalGrid - a.totalGrid;
+    }
     
     // Filtrar usuários por turno APÓS calcular os totais mensais
     const usuariosManha = Object.values(totais)
@@ -1866,10 +2047,12 @@
       // Ordenar a lista filtrada por turno para encontrar a posição
       const usuariosFiltradosVendas = [...usuariosParaComparacao].sort((a, b) => b.totalVendas - a.totalVendas);
       const usuariosFiltradosAbastecimentos = [...usuariosParaComparacao].sort((a, b) => b.totalAbastecimentos - a.totalAbastecimentos);
+      const usuariosFiltradosGrid = [...usuariosParaComparacao].sort((a, b) => b.totalGrid - a.totalGrid);
       
       // Encontrar posição do usuário na lista filtrada
       const posicaoVendas = usuariosFiltradosVendas.findIndex(u => u.login === usuarioLogado.login) + 1;
       const posicaoAbastecimentos = usuariosFiltradosAbastecimentos.findIndex(u => u.login === usuarioLogado.login) + 1;
+      const posicaoGrid = usuariosFiltradosGrid.findIndex(u => u.login === usuarioLogado.login) + 1;
       
       // Atualizar informações na interface
       const dadosUsuarioMes = totais[usuarioLogado.login] || { totalVendas: 0, totalAbastecimentos: 0 };
@@ -1886,6 +2069,11 @@
           if (posicaoAbastecimentos > 0 && dadosUsuarioMes.totalAbastecimentos > 0) {
               textoPosicaoAbastecimentos = `${posicaoAbastecimentos}º lugar (no turno ${filtroTurno === 'todos' ? 'geral' : filtroTurno})`;
           }
+          if (posicaoGrid > 0 && dadosUsuarioMes.totalGrid > 0) {
+              const textoPosicaoGrid = `${posicaoGrid}º lugar (no turno ${filtroTurno === 'todos' ? 'geral' : filtroTurno})`;
+              // Podemos adicionar um elemento para mostrar a posição do grid se necessário, 
+              // mas por enquanto vamos apenas garantir que os dados estejam disponíveis.
+          }
       } else {
           textoPosicaoVendas = "Fora do turno filtrado";
           textoPosicaoAbastecimentos = "Fora do turno filtrado";
@@ -1895,6 +2083,7 @@
       document.getElementById("posicaoAbastecimentos").textContent = textoPosicaoAbastecimentos;
       document.getElementById("totalVendasUsuario").textContent = dadosUsuarioMes.totalVendas;
       document.getElementById("totalAbastecimentosUsuario").textContent = dadosUsuarioMes.totalAbastecimentos;
+      document.getElementById("totalGridUsuario").textContent = dadosUsuarioMes.totalGrid;
       
       // Atualizar dados detalhados também para o funcionário
       atualizarDadosDetalhadosDiarios(); // Chamada mantida aqui
@@ -1906,10 +2095,10 @@
     // Preencher tabela da manhã
     const tbodyManha = document.getElementById("rankingManhaTbody");
     if (filtroTurno === "todos" || filtroTurno === "manha") {
-      const usuariosManhaComDados = usuariosManha.filter(u => u.totalVendas > 0 || u.totalAbastecimentos > 0);
+      const usuariosManhaComDados = usuariosManha.filter(u => u.totalVendas > 0 || u.totalAbastecimentos > 0 || u.totalGrid > 0);
       if (usuariosManhaComDados.length === 0) {
         const tr = document.createElement("tr");
-        tr.innerHTML = '<td colspan="3">Nenhum dado disponível para este filtro</td>';
+        tr.innerHTML = '<td colspan="4">Nenhum dado disponível para este filtro</td>';
         tbodyManha.appendChild(tr);
       } else {
         usuariosManhaComDados.forEach(usuario => {
@@ -1918,23 +2107,24 @@
             <td>${usuario.login}</td>
             <td>${usuario.totalVendas}</td>
             <td>${usuario.totalAbastecimentos}</td>
+            <td>${usuario.totalGrid}</td>
           `;
           tbodyManha.appendChild(tr);
         });
       }
     } else {
       const tr = document.createElement("tr");
-      tr.innerHTML = '<td colspan="3">Filtro aplicado para outro turno</td>';
+      tr.innerHTML = '<td colspan="4">Filtro aplicado para outro turno</td>';
       tbodyManha.appendChild(tr);
     }
     
     // Preencher tabela da tarde
     const tbodyTarde = document.getElementById("rankingTardeTbody");
     if (filtroTurno === "todos" || filtroTurno === "tarde") {
-      const usuariosTardeComDados = usuariosTarde.filter(u => u.totalVendas > 0 || u.totalAbastecimentos > 0);
+      const usuariosTardeComDados = usuariosTarde.filter(u => u.totalVendas > 0 || u.totalAbastecimentos > 0 || u.totalGrid > 0);
       if (usuariosTardeComDados.length === 0) {
         const tr = document.createElement("tr");
-        tr.innerHTML = '<td colspan="3">Nenhum dado disponível para este filtro</td>';
+        tr.innerHTML = '<td colspan="4">Nenhum dado disponível para este filtro</td>';
         tbodyTarde.appendChild(tr);
       } else {
         usuariosTardeComDados.forEach(usuario => {
@@ -1943,13 +2133,14 @@
             <td>${usuario.login}</td>
             <td>${usuario.totalVendas}</td>
             <td>${usuario.totalAbastecimentos}</td>
+            <td>${usuario.totalGrid}</td>
           `;
           tbodyTarde.appendChild(tr);
         });
       }
     } else {
       const tr = document.createElement("tr");
-      tr.innerHTML = '<td colspan="3">Filtro aplicado para outro turno</td>';
+      tr.innerHTML = '<td colspan="4">Filtro aplicado para outro turno</td>';
       tbodyTarde.appendChild(tr);
     }
     
@@ -2109,6 +2300,8 @@
     const folgas = JSON.parse(localStorage.getItem('folgas') || '{}');
     const ranking = JSON.parse(localStorage.getItem('ranking') || '{}');
     const metaGeral = localStorage.getItem('metaGeral') || '1000'; // Incluir meta geral no backup
+    const metasVendasMensais = JSON.parse(localStorage.getItem('metasVendasMensais') || '{}');
+    const metasGridMensais = JSON.parse(localStorage.getItem('metasGridMensais') || '{}');
 
     try {
       // Salvar dados no Firebase
@@ -2116,6 +2309,8 @@
       await salvarFolgasNoFirebase(folgas);
       await salvarRankingNoFirebase(ranking);
       await salvarMetaGeralNoFirebase(metaGeral); // Nova função para salvar meta geral
+      await salvarMetasVendasMensaisNoFirebase(metasVendasMensais);
+      await salvarMetasGridMensaisNoFirebase(metasGridMensais);
       
       alert('Backup realizado com sucesso no Firebase!');
     } catch (error) {
@@ -2157,6 +2352,16 @@
     await ref.set({ valor: metaGeral });
   }
 
+  async function salvarMetasVendasMensaisNoFirebase(metas) {
+    const ref = db.collection("meta").doc("metasVendasMensais");
+    await ref.set(metas);
+  }
+
+  async function salvarMetasGridMensaisNoFirebase(metas) {
+    const ref = db.collection("meta").doc("metasGridMensais");
+    await ref.set(metas);
+  }
+
   // Nova função para ler meta geral do Firebase
   async function lerMetaGeralDoFirebase() {
     try {
@@ -2174,28 +2379,49 @@
     }
   }
 
+  async function lerMetasMensaisDoFirebase(tipo) {
+    try {
+      const ref = db.collection("meta").doc(tipo);
+      const doc = await ref.get();
+      if (doc.exists) {
+        return doc.data();
+      } else {
+        console.log(tipo + " não encontrada no Firebase");
+        return null;
+      }
+    } catch (error) {
+      console.error("Erro ao ler " + tipo + " do Firebase:", error);
+      return null;
+    }
+  }
+
   // Função para inicializar meta geral com prioridade do Firebase
   async function inicializarMetaGeral() {
     try {
+      // Carregar meta geral
       const metaFirebase = await lerMetaGeralDoFirebase();
       if (metaFirebase !== null) {
-        // Se encontrou no Firebase, atualiza o localStorage
         localStorage.setItem("metaGeral", metaFirebase);
         console.log("Meta geral carregada do Firebase:", metaFirebase);
-      } else {
-        // Se não encontrou no Firebase, verifica se existe no localStorage
-        const metaLocal = localStorage.getItem("metaGeral");
-        if (!metaLocal) {
-          // Se não existe nem no Firebase nem no localStorage, define valor padrão
-          localStorage.setItem("metaGeral", "1000");
-          console.log("Meta geral inicializada com valor padrão: 1000");
-        } else {
-          console.log("Meta geral mantida do localStorage:", metaLocal);
-        }
+      } else if (!localStorage.getItem("metaGeral")) {
+        localStorage.setItem("metaGeral", "1000");
+      }
+
+      // Carregar metas de vendas mensais
+      const metasVendasFirebase = await lerMetasMensaisDoFirebase("metasVendasMensais");
+      if (metasVendasFirebase !== null) {
+        localStorage.setItem("metasVendasMensais", JSON.stringify(metasVendasFirebase));
+        console.log("Metas de vendas mensais carregadas do Firebase");
+      }
+
+      // Carregar metas de grid mensais
+      const metasGridFirebase = await lerMetasMensaisDoFirebase("metasGridMensais");
+      if (metasGridFirebase !== null) {
+        localStorage.setItem("metasGridMensais", JSON.stringify(metasGridFirebase));
+        console.log("Metas de grid mensais carregadas do Firebase");
       }
     } catch (error) {
-      console.error("Erro ao inicializar meta geral:", error);
-      // Em caso de erro, garante que existe um valor padrão
+      console.error("Erro ao inicializar metas:", error);
       if (!localStorage.getItem("metaGeral")) {
         localStorage.setItem("metaGeral", "1000");
       }
@@ -2219,11 +2445,15 @@
       const folgas = JSON.parse(localStorage.getItem('folgas') || '{}');
       const ranking = JSON.parse(localStorage.getItem('ranking') || '{}');
       const metaGeral = localStorage.getItem('metaGeral') || '1000'; // Incluir meta geral no backup automático
+      const metasVendasMensais = JSON.parse(localStorage.getItem('metasVendasMensais') || '{}');
+      const metasGridMensais = JSON.parse(localStorage.getItem('metasGridMensais') || '{}');
       try {
         await salvarUsuariosNoFirebase(usuarios);
         await salvarFolgasNoFirebase(folgas);
         await salvarRankingNoFirebase(ranking);
         await salvarMetaGeralNoFirebase(metaGeral); // Salvar meta geral automaticamente
+        await salvarMetasVendasMensaisNoFirebase(metasVendasMensais);
+        await salvarMetasGridMensaisNoFirebase(metasGridMensais);
         console.log("[Backup automático] Backup realizado após alteração.");
       } catch (e) {
         console.error("[Backup automático] Erro ao fazer backup:", e);
@@ -2268,7 +2498,8 @@
                 dadosFiltradosUsuario.push({
                     data: data,
                     vendas: valores.vendas || 0,
-                    abastecimentos: valores.abastecimentos || 0
+                    abastecimentos: valores.abastecimentos || 0,
+                    grid: valores.grid || 0
                 });
             }
         });
@@ -2296,11 +2527,11 @@
                         <h5>${dataFormatada}</h5>
                         <div class="dados-detalhados-info">
                             <div class="dados-detalhados-valores">
-                                Vendas: ${dado.vendas} | Abastecimentos: ${dado.abastecimentos}
+                                Vendas: ${dado.vendas} | Abastecimentos: ${dado.abastecimentos} | Grid: ${dado.grid}
                             </div>
                             ${usuarioLogado.tipo === 'admin' ? `
                             <div class="dados-detalhados-acoes">
-                                <button class="btn-editar" onclick="abrirModalEdicao('${usuarioLogin}', '${dado.data}', ${dado.vendas}, ${dado.abastecimentos})">Editar</button>
+                                <button class="btn-editar" onclick="abrirModalEdicao('${usuarioLogin}', '${dado.data}', ${dado.vendas}, ${dado.abastecimentos}, ${dado.grid})">Editar</button>
                                 <button class="btn-excluir" onclick="excluirDadosDia('${usuarioLogin}', '${dado.data}')">Excluir</button>
                             </div>
                             ` : ''}
@@ -2345,11 +2576,12 @@
   }
 
   // Funções para o modal de edição
-  function abrirModalEdicao(usuario, data, vendas, abastecimentos) {
+  function abrirModalEdicao(usuario, data, vendas, abastecimentos, grid) {
     document.getElementById('modalUsuario').value = usuario;
     document.getElementById('modalData').value = data;
     document.getElementById('modalVendas').value = vendas;
     document.getElementById('modalAbastecimentos').value = abastecimentos;
+    document.getElementById('modalGrid').value = grid || 0;
     document.getElementById('modalEdicao').style.display = 'block';
   }
 
@@ -2362,6 +2594,7 @@
     const data = document.getElementById('modalData').value;
     const vendas = parseInt(document.getElementById('modalVendas').value) || 0;
     const abastecimentos = parseInt(document.getElementById('modalAbastecimentos').value) || 0;
+    const grid = parseInt(document.getElementById('modalGrid').value) || 0;
 
     if (!usuario || !data) {
       alert('Dados inválidos!');
@@ -2377,7 +2610,8 @@
     // Atualizar dados
     ranking[usuario][data] = {
       vendas: vendas,
-      abastecimentos: abastecimentos
+      abastecimentos: abastecimentos,
+      grid: grid
     };
 
     // Salvar ranking
@@ -2454,14 +2688,21 @@
   function atualizarTabelasMetas() {
     const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
     const ranking = JSON.parse(localStorage.getItem("ranking") || "{}");
-    const metaGeral = parseInt(localStorage.getItem("metaGeral")) || 1000; // Meta geral padrão de 1000
-
+    
     // Obter filtros
     const filtroTurno = document.getElementById("filtroTurnoMetas").value;
     const filtroMes = document.getElementById("filtroMesMetas").value;
+    
+    // Obter meta para o mês selecionado
+    const metasVendasMensais = JSON.parse(localStorage.getItem("metasVendasMensais") || "{}");
+    const mesReferencia = filtroMes === 'todos' ? new Date().getMonth() : parseInt(filtroMes);
+    const metaGeral = metasVendasMensais[mesReferencia] || parseInt(localStorage.getItem("metaGeral")) || 1000;
 
-    // Atualizar o input da meta geral
-    document.getElementById("metaGeralInput").value = metaGeral;
+    // Atualizar o input da meta na seção admin se estiver visível
+    if (document.getElementById("metaGeralInput")) {
+      document.getElementById("metaGeralInput").value = metaGeral;
+      document.getElementById("metaGeralMesSelect").value = mesReferencia;
+    }
     
     const metasManhaTable = document.getElementById("metasManhaTable").getElementsByTagName("tbody")[0];
     const metasTardeTable = document.getElementById("metasTardeTable").getElementsByTagName("tbody")[0];
@@ -2636,14 +2877,247 @@
     }
   }
   
-  // Função para salvar a meta geral
+  // Função para salvar a meta geral por mês
   function salvarMetaGeral() {
-    const metaGeralInput = document.getElementById("metaGeralInput");
-    const novaMetaGeral = parseInt(metaGeralInput.value) || 0;
-    localStorage.setItem("metaGeral", novaMetaGeral);
+    const mesSelect = document.getElementById("metaGeralMesSelect");
+    const metaInput = document.getElementById("metaGeralInput");
+    const mes = mesSelect.value;
+    const meta = parseInt(metaInput.value) || 0;
+    
+    // Obter metas existentes
+    const metasVendasMensais = JSON.parse(localStorage.getItem("metasVendasMensais") || "{}");
+    metasVendasMensais[mes] = meta;
+    
+    // Salvar no localStorage
+    localStorage.setItem("metasVendasMensais", JSON.stringify(metasVendasMensais));
+    
+    // Também salvar como meta geral para compatibilidade se for o mês atual
+    const mesAtual = new Date().getMonth();
+    if (parseInt(mes) === mesAtual) {
+      localStorage.setItem("metaGeral", meta);
+    }
+    
     atualizarTabelasMetas();
     backupAutomaticoSeAtivo();
-    alert("Meta geral salva com sucesso!");
+    alert("Meta de vendas para o mês selecionado salva com sucesso!");
+  }
+
+  // Função para salvar meta geral de grid por mês
+  function salvarMetaGeralGrid() {
+    const mesSelect = document.getElementById("metaGeralGridMesSelect");
+    const metaInput = document.getElementById("metaGeralGridInput");
+    const mes = mesSelect.value;
+    const meta = parseInt(metaInput.value) || 0;
+    
+    // Obter metas existentes
+    const metasGridMensais = JSON.parse(localStorage.getItem("metasGridMensais") || "{}");
+    metasGridMensais[mes] = meta;
+    
+    // Salvar no localStorage
+    localStorage.setItem("metasGridMensais", JSON.stringify(metasGridMensais));
+    
+    // Também salvar como meta geral para compatibilidade se for o mês atual
+    const mesAtual = new Date().getMonth();
+    if (parseInt(mes) === mesAtual) {
+      localStorage.setItem("metaGeralGrid", meta);
+    }
+    
+    atualizarTabelasMetasGrid();
+    backupAutomaticoSeAtivo();
+    alert("Meta de grid para o mês selecionado salva com sucesso!");
+  }
+
+  // Função para atualizar as tabelas de metas de grid
+  function atualizarTabelasMetasGrid() {
+    const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
+    const ranking = JSON.parse(localStorage.getItem("ranking") || "{}");
+    
+    // Obter filtros
+    const filtroTurno = document.getElementById("filtroTurnoMetasGrid").value;
+    const filtroMes = document.getElementById("filtroMesMetasGrid").value;
+    
+    // Obter meta para o mês selecionado
+    const metasGridMensais = JSON.parse(localStorage.getItem("metasGridMensais") || "{}");
+    const mesReferencia = filtroMes === 'todos' ? new Date().getMonth() : parseInt(filtroMes);
+    const metaGeralGrid = metasGridMensais[mesReferencia] || parseInt(localStorage.getItem("metaGeralGrid")) || 500;
+
+    // Atualizar o input da meta na seção admin se estiver visível
+    if (document.getElementById("metaGeralGridInput")) {
+      document.getElementById("metaGeralGridInput").value = metaGeralGrid;
+      document.getElementById("metaGeralGridMesSelect").value = mesReferencia;
+    }
+    
+    const metasGridManhaTable = document.getElementById("metasGridManhaTable").getElementsByTagName("tbody")[0];
+    const metasGridTardeTable = document.getElementById("metasGridTardeTable").getElementsByTagName("tbody")[0];
+    
+    // Limpar tabelas
+    metasGridManhaTable.innerHTML = "";
+    metasGridTardeTable.innerHTML = "";
+    
+    // Obter mês e ano para filtro
+    let mesParaFiltro, anoParaFiltro;
+    if (filtroMes === 'todos') {
+      // Se for "todos", usar mês atual como referência para o ano
+      const hoje = new Date();
+      mesParaFiltro = null; // null indica todos os meses
+      anoParaFiltro = hoje.getFullYear();
+    } else {
+      const hoje = new Date();
+      mesParaFiltro = parseInt(filtroMes) + 1; // filtroMes é 0-11, mas precisamos 1-12
+      anoParaFiltro = hoje.getFullYear();
+    }
+    
+    // Verificar se o usuário logado é funcionário
+    if (usuarioLogado && usuarioLogado.tipo === 'funcionario') {
+      // Para funcionários: mostrar apenas sua própria meta de grid
+      const gridMensais = calcularGridMensais(usuarioLogado.login);
+      const faltaParaMetaGrid = Math.max(0, metaGeralGrid - gridMensais);
+      const progressoPorcentagem = Math.min((gridMensais / metaGeralGrid) * 100, 100);
+      
+      // Determinar em qual tabela mostrar (baseado no turno do funcionário)
+      const tabelaDestino = usuarioLogado.turno === 'manha' ? metasGridManhaTable : metasGridTardeTable;
+      const tabelaOutroTurno = usuarioLogado.turno === 'manha' ? metasGridTardeTable : metasGridManhaTable;
+      
+      // Verificar se o filtro de turno permite mostrar os dados do funcionário
+      const mostrarDados = filtroTurno === 'todos' || 
+                          (filtroTurno === 'manha' && usuarioLogado.turno === 'manha') ||
+                          (filtroTurno === 'tarde' && usuarioLogado.turno === 'tarde');
+      
+      if (mostrarDados) {
+        // Mostrar dados do funcionário na tabela do seu turno
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${usuarioLogado.login}</td>
+          <td>
+            Grid: ${gridMensais}<br>
+            Falta: ${faltaParaMetaGrid}
+          </td>
+          <td>
+            <div class="progress-container">
+              <div class="progress-bar" style="width: ${progressoPorcentagem}%">
+                ${progressoPorcentagem.toFixed(1)}%
+              </div>
+            </div>
+          </td>
+        `;
+        tabelaDestino.appendChild(row);
+        
+        // Mostrar mensagem na tabela do outro turno
+        const rowOutroTurno = document.createElement("tr");
+        rowOutroTurno.innerHTML = '<td colspan="3">Você não tem acesso aos dados deste turno</td>';
+        tabelaOutroTurno.appendChild(rowOutroTurno);
+      } else {
+        // Filtro não permite mostrar os dados do funcionário
+        const rowManha = document.createElement("tr");
+        rowManha.innerHTML = '<td colspan="3">Filtro aplicado para outro turno</td>';
+        metasGridManhaTable.appendChild(rowManha);
+        
+        const rowTarde = document.createElement("tr");
+        rowTarde.innerHTML = '<td colspan="3">Filtro aplicado para outro turno</td>';
+        metasGridTardeTable.appendChild(rowTarde);
+      }
+      
+      return; // Sair da função para funcionários
+    }
+    
+    // Para administradores: mostrar todas as metas de grid
+    // Separar usuários por turno
+    const usuariosManha = [];
+    const usuariosTarde = [];
+    
+    usuarios.forEach(usuario => {
+      if (usuario.turno === "manha") {
+        usuariosManha.push({login: usuario.login, ...usuario});
+      } else if (usuario.turno === "tarde") {
+        usuariosTarde.push({login: usuario.login, ...usuario});
+      }
+    });
+    
+    // Função para criar linha da tabela
+    function criarLinhaTabelaGrid(usuario) {
+      const gridMensais = calcularGridMensais(usuario.login);
+      const faltaParaMetaGrid = Math.max(0, metaGeralGrid - gridMensais);
+      const progressoPorcentagem = Math.min((gridMensais / metaGeralGrid) * 100, 100);
+      
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${usuario.login}</td>
+        <td>
+          Grid: ${gridMensais}<br>
+          Falta: ${faltaParaMetaGrid}
+        </td>
+        <td>
+          <div class="progress-container">
+            <div class="progress-bar" style="width: ${progressoPorcentagem}%">
+              ${progressoPorcentagem.toFixed(1)}%
+            </div>
+          </div>
+        </td>
+      `;
+      return row;
+    }
+    
+    // Função auxiliar para calcular grid mensal
+    function calcularGridMensais(login) {
+      let totalGrid = 0;
+      const dadosUsuario = ranking[login] || {};
+      
+      for (const data in dadosUsuario) {
+        // Usar T00:00:00 para evitar problemas de fuso horário
+        const dataObj = new Date(data + 'T00:00:00');
+        const mes = dataObj.getMonth() + 1;
+        const ano = dataObj.getFullYear();
+        
+        // Aplicar filtro de mês
+        if (mesParaFiltro === null) {
+          // Todos os meses do ano atual
+          if (ano === anoParaFiltro) {
+            totalGrid += dadosUsuario[data].grid || 0;
+          }
+        } else {
+          // Mês específico do ano atual
+          if (mes === mesParaFiltro && ano === anoParaFiltro) {
+            totalGrid += dadosUsuario[data].grid || 0;
+          }
+        }
+      }
+      
+      return totalGrid;
+    }
+    
+    // Mostrar usuários do turno da manhã
+    if (filtroTurno === 'todos' || filtroTurno === 'manha') {
+      if (usuariosManha.length === 0) {
+        const row = document.createElement("tr");
+        row.innerHTML = '<td colspan="3">Nenhum funcionário no turno da manhã</td>';
+        metasGridManhaTable.appendChild(row);
+      } else {
+        usuariosManha.forEach(usuario => {
+          metasGridManhaTable.appendChild(criarLinhaTabelaGrid(usuario));
+        });
+      }
+    } else {
+      const row = document.createElement("tr");
+      row.innerHTML = '<td colspan="3">Filtro aplicado para outro turno</td>';
+      metasGridManhaTable.appendChild(row);
+    }
+    
+    // Mostrar usuários do turno da tarde
+    if (filtroTurno === 'todos' || filtroTurno === 'tarde') {
+      if (usuariosTarde.length === 0) {
+        const row = document.createElement("tr");
+        row.innerHTML = '<td colspan="3">Nenhum funcionário no turno da tarde</td>';
+        metasGridTardeTable.appendChild(row);
+      } else {
+        usuariosTarde.forEach(usuario => {
+          metasGridTardeTable.appendChild(criarLinhaTabelaGrid(usuario));
+        });
+      }
+    } else {
+      const row = document.createElement("tr");
+      row.innerHTML = '<td colspan="3">Filtro aplicado para outro turno</td>';
+      metasGridTardeTable.appendChild(row);
+    }
   }
 
   // Remover a função atualizarMeta, pois a meta agora é geral
@@ -2654,7 +3128,9 @@
   //   atualizarTabelasMetas();
   //   backupAutomaticoSeAtivo();
   // }
-</script>
+
+  // ================= METAS DE GRID =================
+  </script>
 </body>
 </html>
 
